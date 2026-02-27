@@ -2,7 +2,7 @@
 
 A high-performance, 100% offline desktop application for background removal from images. Built with **Wails v2**, **Go**, and **Vue 3**, powered by the **RMBG-2.0 (BiRefNet)** model via **ONNX Runtime**.
 
-![App screenshot](image.png)
+![App Screnshoy](image-1.png)
 
 ## 🚀 Features
 
