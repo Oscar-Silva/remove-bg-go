@@ -1,10 +1,11 @@
 module remove-bg-go
 
-go 1.23
+go 1.24.0
 
 require (
 	github.com/wailsapp/wails/v2 v2.11.0
-	github.com/yalue/onnxruntime_go v1.26.1-0.20260217143216-45eb52b8edb5
+	github.com/yalue/onnxruntime_go v1.14.0
+	golang.org/x/image v0.36.0
 )
 
 require (
@@ -34,5 +35,5 @@ require (
 	golang.org/x/crypto v0.33.0 // indirect
 	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 )

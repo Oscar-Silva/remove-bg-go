@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import { Upload } from 'lucide-vue-next'
 import { useAppStore } from '@/stores/app'
 import { fileToBase64 } from '@/lib/utils'
+import { RemoveBackground } from '@wailsjs/go/main/App'
+import { EventsOn } from '@wailsjs/runtime'
 
 const store = useAppStore()
 const isDragging = ref(false)
@@ -10,6 +12,16 @@ const fileInput = ref<HTMLInputElement | null>(null)
 
 const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp']
 const MAX_SIZE = 20 * 1024 * 1024 // 20MB
+
+// Listen for status updates from Go
+EventsOn('status', (status: string) => {
+  store.setStatusMessage(status)
+  if (status === 'done') {
+    // Result will be set after RemoveBackground returns
+  } else if (status === 'error') {
+    store.setError('Processing failed')
+  }
+})
 
 async function handleFile(file: File) {
   if (!ACCEPTED_TYPES.includes(file.type)) {
@@ -24,10 +36,18 @@ async function handleFile(file: File) {
 
   try {
     const base64 = await fileToBase64(file)
+    // Remove data URL prefix if present
+    const imageData = base64.replace(/^data:image\/\w+;base64,/, '')
     store.setOriginalImage(base64)
     store.setLoading('Processing image...')
+    
+    // Call the Go backend
+    const result = await RemoveBackground(imageData)
+    store.setResultImage(result)
+    store.setDone()
   } catch (e) {
-    store.setError('Failed to read file')
+    const errorMsg = e instanceof Error ? e.message : String(e)
+    store.setError('Failed to process image: ' + errorMsg)
   }
 }
 

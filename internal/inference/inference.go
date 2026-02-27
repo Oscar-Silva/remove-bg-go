@@ -55,8 +55,8 @@ func NewSession(modelPath string) (*Session, error) {
 	// The model input/output names need to be inferred from the model
 	// For RMBG model, typically input is "input" and output is "sigmoid_0" or similar
 	// We'll try common names and adjust if needed
-	inputNames := []string{"input"}
-	outputNames := []string{"sigmoid_0"}
+	inputNames := []string{"pixel_values"}
+	outputNames := []string{"alphas"}
 
 	// Try to create session - if input/output names are wrong, we'll get an error
 	// and can try alternative names

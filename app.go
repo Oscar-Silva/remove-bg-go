@@ -5,9 +5,13 @@ import (
 	"encoding/base64"
 	"fmt"
 	"image"
+	_ "image/jpeg"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	_ "golang.org/x/image/webp"
 
 	"remove-bg-go/internal/inference"
 )
@@ -23,10 +27,25 @@ type App struct {
 
 // NewApp creates a new App application struct
 func NewApp() *App {
+	modelPath := "models/RMBG-2.0/onnx/model.onnx"
+	if exePath, err := os.Executable(); err == nil {
+		exeDir := filepath.Dir(exePath)
+		absModelPath := filepath.Join(exeDir, "..", "..", "models", "RMBG-2.0", "onnx", "model.onnx")
+		if _, err := os.Stat(absModelPath); err == nil {
+			modelPath = absModelPath
+		} else {
+			// fallback check inside same dir
+			absModelPath2 := filepath.Join(exeDir, "models", "RMBG-2.0", "onnx", "model.onnx")
+			if _, err := os.Stat(absModelPath2); err == nil {
+				modelPath = absModelPath2
+			}
+		}
+	}
+
 	return &App{
 		preprocessor:  inference.NewPreprocessor(1024, []float32{0.5, 0.5, 0.5}, []float32{0.5, 0.5, 0.5}),
 		postprocessor: inference.NewPostprocessor(),
-		modelPath:     "models/RMBG-2.0/onnx/model.onnx",
+		modelPath:     modelPath,
 	}
 }
 
