@@ -20,15 +20,15 @@ jobs:
           - os: ubuntu-latest
             platform: linux
             arch: x64
-            onnx_url: "https://github.com/microsoft/onnxruntime/releases/download/v1.18.1/onnxruntime-linux-x64-1.18.1.tgz"
-            onnx_lib_file: "libonnxruntime.so.1.18.1"
+            onnx_url: "https://github.com/microsoft/onnxruntime/releases/download/v1.20.1/onnxruntime-linux-x64-1.20.1.tgz"
+            onnx_lib_file: "libonnxruntime.so.1.20.1"
             onnx_lib_final: "libonnxruntime.so.1"
             wails_platform: "linux/amd64"
             executable_name: "remove-bg-go"
           - os: windows-latest
             platform: windows
             arch: x64
-            onnx_url: "https://github.com/microsoft/onnxruntime/releases/download/v1.18.1/onnxruntime-win-x64-1.18.1.zip"
+            onnx_url: "https://github.com/microsoft/onnxruntime/releases/download/v1.20.1/onnxruntime-win-x64-1.20.1.zip"
             onnx_lib_file: "onnxruntime.dll"
             onnx_lib_final: "onnxruntime.dll"
             wails_platform: "windows/amd64"
@@ -36,8 +36,8 @@ jobs:
           - os: macos-latest
             platform: darwin
             arch: universal
-            onnx_url: "https://github.com/microsoft/onnxruntime/releases/download/v1.18.1/onnxruntime-osx-universal2-1.18.1.tgz"
-            onnx_lib_file: "libonnxruntime.1.18.1.dylib"
+            onnx_url: "https://github.com/microsoft/onnxruntime/releases/download/v1.20.1/onnxruntime-osx-universal2-1.20.1.tgz"
+            onnx_lib_file: "libonnxruntime.1.20.1.dylib"
             onnx_lib_final: "libonnxruntime.dylib"
             wails_platform: "darwin/universal"
             executable_name: "remove-bg-go.app"
