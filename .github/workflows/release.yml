@@ -65,7 +65,13 @@ jobs:
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
       - name: Build Wails App
-        run: wails build -platform ${{ matrix.wails_platform }} -clean
+        run: |
+          if [ "${{ runner.os }}" == "Linux" ]; then
+            wails build -platform ${{ matrix.wails_platform }} -clean -tags webkit2_41
+          else
+            wails build -platform ${{ matrix.wails_platform }} -clean
+          fi
+        shell: bash
         env:
           CGO_ENABLED: 1
 
