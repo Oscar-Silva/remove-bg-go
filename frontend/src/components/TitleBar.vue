@@ -18,7 +18,7 @@ function close() {
 <template>
   <div
     class="h-12 bg-transparent flex items-center justify-between px-4 select-none backdrop-blur-sm border-b border-white/5"
-    style="-webkit-app-region: drag"
+    style="-webkit-app-region: drag; --wails-draggable: drag;"
   >
     <!-- Logo and Title -->
     <div class="flex items-center gap-2">
@@ -41,7 +41,7 @@ function close() {
     <!-- Window Controls -->
     <div
       class="flex items-center gap-1"
-      style="-webkit-app-region: no-drag"
+      style="-webkit-app-region: no-drag; --wails-draggable: no-drag;"
     >
       <!-- Minimize -->
       <button
