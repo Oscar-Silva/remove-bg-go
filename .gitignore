@@ -1,0 +1,7 @@
+build/bin
+node_modules
+frontend/dist
+models/
+onnxruntime-linux-x64-1.20.1/
+onnxruntime-linux-x64-gpu-1.20.1/
+lib/
