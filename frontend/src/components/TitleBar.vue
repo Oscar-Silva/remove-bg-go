@@ -22,19 +22,7 @@ function close() {
   >
     <!-- Logo and Title -->
     <div class="flex items-center gap-2">
-      <div class="w-6 h-6 rounded-lg bg-accent flex items-center justify-center">
-        <svg
-          class="w-4 h-4 text-white"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
-          <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
-          <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
-        </svg>
-      </div>
+      <img src="../assets/images/remove-bg-go-icon.svg" class="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(108,92,231,0.5)]" alt="Remove Background Logo" />
       <span class="text-sm font-medium text-textPrimary">Remove Background</span>
     </div>
 
