@@ -43,16 +43,16 @@ func (pt *DownloadProgressTracker) Write(p []byte) (int, error) {
 
 // DownloadModel downloads the requested model from Hugging Face
 func DownloadModel(ctx context.Context, modelID, destPath string) error {
-	// RMBG-2.0 is a gated model, requires HF_TOKEN
-	hfToken := os.Getenv("HF_TOKEN")
-
-	url := fmt.Sprintf("https://huggingface.co/briaai/RMBG-2.0/resolve/main/onnx/%s?download=true", modelID)
+	url := fmt.Sprintf("https://huggingface.co/camenduru/RMBG-2.0/resolve/main/onnx/%s?download=true", modelID)
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 
+	// We no longer strictly need HF_TOKEN since we use a public mirror,
+	// but we could still pass it if set.
+	hfToken := os.Getenv("HF_TOKEN")
 	if hfToken != "" {
 		req.Header.Set("Authorization", "Bearer "+hfToken)
 	}

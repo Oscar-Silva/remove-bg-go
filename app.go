@@ -45,15 +45,24 @@ var AvailableModels = []ModelConfig{
 // NewApp creates a new App application struct
 func NewApp() *App {
 	modelDir := "models/RMBG-2.0/onnx"
+	if cacheDir, err := os.UserCacheDir(); err == nil {
+		globalModelDir := filepath.Join(cacheDir, "remove-bg-go", "models", "RMBG-2.0", "onnx")
+		if err := os.MkdirAll(globalModelDir, 0755); err == nil {
+			modelDir = globalModelDir
+		}
+	}
+
 	if exePath, err := os.Executable(); err == nil {
 		exeDir := filepath.Dir(exePath)
 		absModelDir := filepath.Join(exeDir, "..", "..", "models", "RMBG-2.0", "onnx")
-		if _, err := os.Stat(filepath.Join(absModelDir, ".")); err == nil {
+		if _, err := os.Stat(filepath.Join(absModelDir, "model_fp16.onnx")); err == nil {
 			modelDir = absModelDir
 		} else {
 			// fallback check inside same dir
 			absModelDir2 := filepath.Join(exeDir, "models", "RMBG-2.0", "onnx")
-			modelDir = absModelDir2
+			if _, err := os.Stat(filepath.Join(absModelDir2, "model_fp16.onnx")); err == nil {
+				modelDir = absModelDir2
+			}
 		}
 	}
 

@@ -1,0 +1,120 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            onnx_url: "https://github.com/microsoft/onnxruntime/releases/download/v1.18.1/onnxruntime-linux-x64-1.18.1.tgz"
+            onnx_lib_file: "libonnxruntime.so.1.18.1"
+            onnx_lib_final: "libonnxruntime.so.1"
+            wails_platform: "linux/amd64"
+            executable_name: "remove-bg-go"
+          - os: windows-latest
+            platform: windows
+            arch: x64
+            onnx_url: "https://github.com/microsoft/onnxruntime/releases/download/v1.18.1/onnxruntime-win-x64-1.18.1.zip"
+            onnx_lib_file: "onnxruntime.dll"
+            onnx_lib_final: "onnxruntime.dll"
+            wails_platform: "windows/amd64"
+            executable_name: "remove-bg-go.exe"
+          - os: macos-latest
+            platform: darwin
+            arch: universal
+            onnx_url: "https://github.com/microsoft/onnxruntime/releases/download/v1.18.1/onnxruntime-osx-universal2-1.18.1.tgz"
+            onnx_lib_file: "libonnxruntime.1.18.1.dylib"
+            onnx_lib_final: "libonnxruntime.dylib"
+            wails_platform: "darwin/universal"
+            executable_name: "remove-bg-go.app"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
+
+      - name: Install Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Build Wails App
+        run: wails build -platform ${{ matrix.wails_platform }} -clean
+        env:
+          CGO_ENABLED: 1
+
+      - name: Download ONNX Runtime (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          curl -LO ${{ matrix.onnx_url }}
+          tar -xzf *.tgz
+
+      - name: Download ONNX Runtime (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "${{ matrix.onnx_url }}" -OutFile "onnxruntime.zip"
+          Expand-Archive -Path "onnxruntime.zip" -DestinationPath "."
+
+      - name: Prepare Release Package (Linux/Windows)
+        if: runner.os != 'macOS'
+        shell: bash
+        run: |
+          mkdir -p release_pkg
+          # Copy executable
+          cp build/bin/${{ matrix.executable_name }} release_pkg/
+          # Find and copy ONNX library
+          find . -name "${{ matrix.onnx_lib_file }}" -exec cp {} release_pkg/${{ matrix.onnx_lib_final }} \;
+
+      - name: Prepare Release Package (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          mkdir -p release_pkg
+          # For macOS, we zip the .app bundle and place the dylib inside the Contents/MacOS folder 
+          # so it's next to the actual unix executable.
+          cp -r build/bin/${{ matrix.executable_name }} release_pkg/
+          find . -name "${{ matrix.onnx_lib_file }}" -exec cp {} release_pkg/${{ matrix.executable_name }}/Contents/MacOS/${{ matrix.onnx_lib_final }} \;
+
+      - name: Create Archive (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          cd release_pkg
+          zip -r ../remove-bg-go-${{ matrix.platform }}-${{ matrix.arch }}.zip ./*
+
+      - name: Create Archive (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path release_pkg\* -DestinationPath remove-bg-go-${{ matrix.platform }}-${{ matrix.arch }}.zip
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: remove-bg-go-${{ matrix.platform }}-${{ matrix.arch }}.zip

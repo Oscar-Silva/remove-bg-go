@@ -8,6 +8,9 @@ import (
 	"image/color"
 	"image/png"
 	"math"
+	"os"
+	"path/filepath"
+	"runtime"
 
 	ort "github.com/yalue/onnxruntime_go"
 )
@@ -25,8 +28,28 @@ type Session struct {
 
 // NewSession creates a new ONNX session and loads the model
 func NewSession(modelPath string) (*Session, error) {
-	// Initialize ONNX Runtime
-	ort.SetSharedLibraryPath("/usr/local/lib/libonnxruntime.so.1")
+	// Find ONNX runtime library dynamically next to the executable
+	sharedLibName := "libonnxruntime.so.1"
+	if runtime.GOOS == "windows" {
+		sharedLibName = "onnxruntime.dll"
+	} else if runtime.GOOS == "darwin" {
+		sharedLibName = "libonnxruntime.dylib"
+	}
+
+	exePath, err := os.Executable()
+	if err == nil {
+		exeDir := filepath.Dir(exePath)
+		libPath := filepath.Join(exeDir, sharedLibName)
+		if _, err := os.Stat(libPath); err == nil {
+			ort.SetSharedLibraryPath(libPath)
+		} else {
+			// Fallback to system paths or the local dev path
+			ort.SetSharedLibraryPath(sharedLibName)
+		}
+	} else {
+		ort.SetSharedLibraryPath(sharedLibName)
+	}
+
 	if err := ort.InitializeEnvironment(); err != nil {
 		return nil, fmt.Errorf("failed to initialize ONNX environment: %w", err)
 	}
