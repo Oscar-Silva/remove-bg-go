@@ -1,6 +1,6 @@
 # Remove Background Go: 100% Offline AI Background Remover
 
-A high-performance, **100% offline desktop application** for professional **AI background removal** from images. Built with **Go (Golang)**, **Wails v2**, and **Vue 3**, it delivers state-of-the-art results using the **RMBG-2.0 (BiRefNet)** model powered by **ONNX Runtime**.
+A high-performance, **100% offline desktop application** for professional **AI background removal** from images. Built with **Go (Golang)**, **Wails v2**, and **Vue 3**, it delivers state-of-the-art results using the **RMBG-2.0** model powered by **ONNX Runtime**.
 
 ![App Screnshoy](image-1.png)
 
