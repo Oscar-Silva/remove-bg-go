@@ -1,20 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --color-background: #0A0A0F;
-  --color-surface: #111118;
-  --color-surface-elevated: #1C1C27;
-  --color-border: #2A2A3D;
-  --color-accent: #7C6EFA;
-  --color-accent-hover: #9D8FFF;
-  --color-success: #34D399;
-  --color-error: #F87171;
-  --color-text-primary: #F0F0FF;
-  --color-text-muted: #8B8BA7;
+  --color-background: #05050a;
+  --color-surface: #0e0e14;
+  --color-surface-elevated: #161620;
+  --color-border: #232332;
+  --color-accent: #6c5ce7;
+  --color-accent-hover: #8172ff;
+  --color-success: #00b894;
+  --color-error: #ff7675;
+  --color-text-primary: #f8f8ff;
+  --color-text-muted: #a0a0b8;
+
+  --glass-bg: rgba(22, 22, 32, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 * {
@@ -23,14 +27,20 @@
   box-sizing: border-box;
 }
 
-html, body, #app {
+html,
+body,
+#app {
   height: 100%;
   width: 100%;
   overflow: hidden;
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   background-color: var(--color-background);
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
@@ -69,7 +79,8 @@ body {
 }
 
 /* Disable text selection on UI elements */
-button, [role="button"] {
+button,
+[role="button"] {
   user-select: none;
 }
 

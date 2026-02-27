@@ -17,7 +17,7 @@ function close() {
 
 <template>
   <div
-    class="h-10 bg-surface flex items-center justify-between px-4 select-none border-b border-border"
+    class="h-12 bg-transparent flex items-center justify-between px-4 select-none backdrop-blur-sm border-b border-white/5"
     style="-webkit-app-region: drag"
   >
     <!-- Logo and Title -->
@@ -46,7 +46,7 @@ function close() {
       <!-- Minimize -->
       <button
         @click="minimize"
-        class="w-8 h-8 rounded-lg flex items-center justify-center text-textMuted hover:text-textPrimary hover:bg-surfaceElevated transition-all duration-150"
+        class="w-8 h-8 rounded-lg flex items-center justify-center text-textMuted hover:text-textPrimary hover:bg-white/10 transition-all duration-200"
       >
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M5 12h14" />
@@ -56,7 +56,7 @@ function close() {
       <!-- Maximize -->
       <button
         @click="toggleMaximize"
-        class="w-8 h-8 rounded-lg flex items-center justify-center text-textMuted hover:text-textPrimary hover:bg-surfaceElevated transition-all duration-150"
+        class="w-8 h-8 rounded-lg flex items-center justify-center text-textMuted hover:text-textPrimary hover:bg-white/10 transition-all duration-200"
       >
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="18" height="18" rx="2" />

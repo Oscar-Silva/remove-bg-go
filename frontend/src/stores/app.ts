@@ -12,7 +12,6 @@ export interface HistoryItem {
 }
 
 export const useAppStore = defineStore("app", () => {
-  // State
   const currentState = ref<AppState>("idle");
   const originalImage = ref<string | null>(null);
   const resultImage = ref<string | null>(null);
@@ -20,6 +19,11 @@ export const useAppStore = defineStore("app", () => {
   const error = ref<string | null>(null);
   const history = ref<HistoryItem[]>([]);
   const progress = ref<number>(0);
+  const selectedModel = ref<string>("model_fp16.onnx");
+  const downloadProgress = ref<{ downloaded: number; total: number }>({
+    downloaded: 0,
+    total: 0,
+  });
 
   // Computed
   const isIdle = computed(() => currentState.value === "idle");
@@ -105,6 +109,14 @@ export const useAppStore = defineStore("app", () => {
     progress.value = value;
   }
 
+  function setDownloadProgress(downloaded: number, total: number) {
+    downloadProgress.value = { downloaded, total };
+  }
+
+  function setSelectedModel(modelId: string) {
+    selectedModel.value = modelId;
+  }
+
   function reset() {
     currentState.value = "idle";
     originalImage.value = null;
@@ -127,6 +139,8 @@ export const useAppStore = defineStore("app", () => {
     error,
     history,
     progress,
+    selectedModel,
+    downloadProgress,
 
     // Computed
     isIdle,
@@ -149,6 +163,8 @@ export const useAppStore = defineStore("app", () => {
     setResultImage,
     setStatusMessage,
     setProgress,
+    setDownloadProgress,
+    setSelectedModel,
     reset,
     removeFromHistory,
   };

@@ -157,6 +157,11 @@ func (s *Session) GetInputShape() []int64 {
 	return []int64{1, 3, 1024, 1024}
 }
 
+// GetModelPath returns the path to the loaded model
+func (s *Session) GetModelPath() string {
+	return s.modelPath
+}
+
 // GetOutputShape returns expected output shape
 func (s *Session) GetOutputShape() []int64 {
 	return []int64{1, 1, 1024, 1024}

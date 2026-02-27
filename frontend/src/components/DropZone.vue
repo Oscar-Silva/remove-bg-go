@@ -5,6 +5,7 @@ import { useAppStore } from '@/stores/app'
 import { fileToBase64 } from '@/lib/utils'
 import { RemoveBackground } from '@wailsjs/go/main/App'
 import { EventsOn } from '@wailsjs/runtime'
+import ModelSelector from './ModelSelector.vue'
 
 const store = useAppStore()
 const isDragging = ref(false)
@@ -21,6 +22,10 @@ EventsOn('status', (status: string) => {
   } else if (status === 'error') {
     store.setError('Processing failed')
   }
+})
+
+EventsOn('download_progress', (data: { downloaded: number; total: number }) => {
+  store.setDownloadProgress(data.downloaded, data.total)
 })
 
 async function handleFile(file: File) {
@@ -41,8 +46,8 @@ async function handleFile(file: File) {
     store.setOriginalImage(base64)
     store.setLoading('Processing image...')
     
-    // Call the Go backend
-    const result = await RemoveBackground(imageData)
+    // Call the Go backend with selected model
+    const result = await RemoveBackground(imageData, store.selectedModel)
     store.setResultImage(result)
     store.setDone()
   } catch (e) {
@@ -94,34 +99,36 @@ function handleFileInput(e: Event) {
       :class="[
         'cursor-crosshair',
         'relative',
-        'border-2',
-        'border-dashed',
-        'rounded-2xl',
-        'p-12',
+        'rounded-3xl',
+        'p-16',
         'flex',
         'flex-col',
         'items-center',
         'justify-center',
         'gap-6',
         'transition-all',
-        'duration-200',
+        'duration-300',
+        'border border-white/5',
+        'bg-white/[0.02] backdrop-blur-xl',
         isDragging
-          ? 'border-accent bg-accent/10 shadow-glow'
-          : 'border-border hover:border-accent/50 hover:bg-surfaceElevated/50'
+          ? 'scale-[1.02] shadow-[0_0_40px_-10px_rgba(108,92,231,0.5)] border-accent/50 bg-accent/[0.05]'
+          : 'hover:border-accent/30 hover:bg-white/[0.04] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]'
       ]"
     >
       <!-- Animated Icon -->
       <div
         :class="[
-          'w-20 h-20',
+          'w-24 h-24',
           'rounded-2xl',
-          'bg-surfaceElevated',
           'flex',
           'items-center',
           'justify-center',
-          'transition-transform',
-          'duration-300',
-          isDragging ? 'scale-110' : 'hover:scale-105',
+          'transition-all',
+          'duration-500',
+          'z-10',
+          'bg-gradient-to-tr from-surfaceElevated to-surface',
+          'border border-white/5 shadow-xl',
+          isDragging ? 'scale-110 shadow-[0_0_30px_rgba(108,92,231,0.3)]' : 'hover:scale-105',
           isDragging ? 'animate-pulse' : 'animate-float'
         ]"
       >
@@ -129,18 +136,18 @@ function handleFileInput(e: Event) {
           :class="[
             'w-10 h-10',
             'transition-colors',
-            'duration-200',
-            isDragging ? 'text-accent' : 'text-textMuted'
+            'duration-300',
+            isDragging ? 'text-accent drop-shadow-[0_0_8px_rgba(108,92,231,0.8)]' : 'text-textMuted'
           ]"
         />
       </div>
 
       <!-- Text -->
-      <div class="text-center">
-        <p class="text-lg font-medium text-textPrimary mb-1">
+      <div class="text-center z-10">
+        <p class="text-xl font-semibold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent mb-2">
           Drop your image here
         </p>
-        <p class="text-sm text-textMuted">
+        <p class="text-sm text-textMuted font-medium">
           PNG, JPG, WEBP up to 20MB
         </p>
       </div>
@@ -158,14 +165,20 @@ function handleFileInput(e: Event) {
     <!-- Border Animation -->
     <div
       v-if="!isDragging"
-      class="absolute inset-0 rounded-2xl pointer-events-none"
+      class="absolute inset-0 rounded-3xl pointer-events-none p-[1px]"
       style="
-        background: linear-gradient(90deg, transparent 50%, rgba(124, 110, 250, 0.1) 50%);
+        background: linear-gradient(90deg, transparent 50%, rgba(108, 92, 231, 0.4) 50%);
         background-size: 200% 100%;
-        animation: shimmer 3s linear infinite;
+        animation: shimmer 4s linear infinite;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
       "
     />
   </div>
+  
+  <ModelSelector v-if="!isDragging" class="mt-8" />
 </template>
 
 <style scoped>

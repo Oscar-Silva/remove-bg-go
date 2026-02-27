@@ -70,17 +70,21 @@ function removeAnother() {
 <template>
   <div class="w-full">
     <!-- Comparison View -->
-    <div
-      ref="containerRef"
-      class="relative w-full aspect-square rounded-2xl overflow-hidden bg-surface cursor-grab active:cursor-grabbing select-none"
-      @mousedown="startDrag"
-      @mousemove="onDrag"
-      @mouseup="stopDrag"
-      @mouseleave="stopDrag"
-      @touchstart="startDrag"
-      @touchmove="onDrag"
-      @touchend="stopDrag"
-    >
+    <div class="relative group">
+      <!-- Glow effect -->
+      <div class="absolute -inset-1 bg-gradient-to-r from-accent to-[#00B894] rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
+      
+      <div
+        ref="containerRef"
+        class="relative w-full aspect-square rounded-2xl overflow-hidden bg-surfaceElevated/80 backdrop-blur-md border border-white/10 cursor-grab active:cursor-grabbing select-none shadow-2xl"
+        @mousedown="startDrag"
+        @mousemove="onDrag"
+        @mouseup="stopDrag"
+        @mouseleave="stopDrag"
+        @touchstart="startDrag"
+        @touchmove="onDrag"
+        @touchend="stopDrag"
+      >
       <!-- Checkerboard Background -->
       <div
         class="absolute inset-0"
@@ -133,41 +137,42 @@ function removeAnother() {
       </div>
 
       <!-- Labels -->
-      <div class="absolute top-4 left-4 px-3 py-1.5 rounded-lg bg-black/50 text-xs text-white font-medium backdrop-blur-sm">
-        Original
+      <div class="absolute top-6 left-6 px-4 py-2 rounded-xl bg-black/40 text-[11px] text-white/90 font-medium backdrop-blur-md border border-white/10 shadow-lg tracking-wider">
+        ORIGINAL
       </div>
-      <div class="absolute top-4 right-4 px-3 py-1.5 rounded-lg bg-accent/80 text-xs text-white font-medium backdrop-blur-sm">
-        Result
+      <div class="absolute top-6 right-6 px-4 py-2 rounded-xl bg-accent/60 text-[11px] text-white font-medium backdrop-blur-md border border-white/20 shadow-[0_0_20px_rgba(108,92,231,0.3)] tracking-wider">
+        RESULT
       </div>
+    </div>
     </div>
 
     <!-- Action Buttons -->
-    <div class="flex items-center justify-center gap-4 mt-8">
+    <div class="flex items-center justify-center gap-4 mt-10">
       <!-- Download -->
       <button
         @click="downloadImage"
-        class="flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent-hover text-white font-medium rounded-xl transition-all duration-200 hover:scale-[0.97] active:scale-[0.95]"
+        class="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-accent to-accent-hover hover:from-accent-hover hover:to-accent text-white font-medium rounded-2xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-[0_10px_30px_-10px_rgba(108,92,231,0.5)] border border-white/10"
       >
-        <Download class="w-5 h-5" />
-        Download PNG
+        <Download class="w-5 h-5 drop-shadow-md" />
+        <span class="tracking-wide">Download PNG</span>
       </button>
 
       <!-- Remove Another -->
       <button
         @click="removeAnother"
-        class="flex items-center gap-2 px-6 py-3 bg-surfaceElevated hover:bg-surface text-textMuted hover:text-textPrimary font-medium rounded-xl border border-border transition-all duration-200 hover:scale-[0.97] active:scale-[0.95]"
+        class="flex items-center gap-2 px-6 py-4 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur text-textMuted hover:text-white font-medium rounded-2xl border border-white/5 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg"
       >
         <Plus class="w-5 h-5" />
-        Remove another
+        Remove Another
       </button>
 
       <!-- Copy to Clipboard -->
       <button
         @click="copyToClipboard"
-        class="flex items-center gap-2 px-4 py-3 bg-surfaceElevated hover:bg-surface text-textMuted hover:text-textPrimary font-medium rounded-xl border border-border transition-all duration-200 hover:scale-[0.97] active:scale-[0.95]"
+        class="flex items-center gap-2 px-5 py-4 bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur text-textMuted hover:text-white font-medium rounded-2xl border border-white/5 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg"
         :title="copied ? 'Copied!' : 'Copy to clipboard'"
       >
-        <Check v-if="copied" class="w-5 h-5 text-success" />
+        <Check v-if="copied" class="w-5 h-5 text-success drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
         <Copy v-else class="w-5 h-5" />
       </button>
     </div>

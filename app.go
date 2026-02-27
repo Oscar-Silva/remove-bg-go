@@ -22,48 +22,94 @@ type App struct {
 	session       *inference.Session
 	preprocessor  *inference.Preprocessor
 	postprocessor *inference.Postprocessor
-	modelPath     string
+	modelDir      string // base models dir
+}
+
+type ModelConfig struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	SizeMB    int    `json:"sizeMB"`
+	RAM       string `json:"ram"`
+	Speed     string `json:"speed"`
+	Quality   string `json:"quality"`
+	IsDefault bool   `json:"isDefault"`
+}
+
+var AvailableModels = []ModelConfig{
+	{ID: "model.onnx", Name: "Alta Precisão (FP32)", SizeMB: 1024, RAM: "~2.0 GB", Speed: "Lenta", Quality: "Excelente", IsDefault: false},
+	{ID: "model_fp16.onnx", Name: "Equilibrado (FP16)", SizeMB: 513, RAM: "~1.0 GB", Speed: "Rápida", Quality: "Ótima", IsDefault: true},
+	{ID: "model_quantized.onnx", Name: "Rápido (INT8)", SizeMB: 366, RAM: "~700 MB", Speed: "Muito Rápida", Quality: "Boa", IsDefault: false},
+	{ID: "model_bnb4.onnx", Name: "Ultra Rápido (Q4)", SizeMB: 233, RAM: "~500 MB", Speed: "Mais Rápida", Quality: "Aceitável", IsDefault: false},
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	modelPath := "models/RMBG-2.0/onnx/model.onnx"
+	modelDir := "models/RMBG-2.0/onnx"
 	if exePath, err := os.Executable(); err == nil {
 		exeDir := filepath.Dir(exePath)
-		absModelPath := filepath.Join(exeDir, "..", "..", "models", "RMBG-2.0", "onnx", "model.onnx")
-		if _, err := os.Stat(absModelPath); err == nil {
-			modelPath = absModelPath
+		absModelDir := filepath.Join(exeDir, "..", "..", "models", "RMBG-2.0", "onnx")
+		if _, err := os.Stat(filepath.Join(absModelDir, ".")); err == nil {
+			modelDir = absModelDir
 		} else {
 			// fallback check inside same dir
-			absModelPath2 := filepath.Join(exeDir, "models", "RMBG-2.0", "onnx", "model.onnx")
-			if _, err := os.Stat(absModelPath2); err == nil {
-				modelPath = absModelPath2
-			}
+			absModelDir2 := filepath.Join(exeDir, "models", "RMBG-2.0", "onnx")
+			modelDir = absModelDir2
 		}
 	}
 
 	return &App{
 		preprocessor:  inference.NewPreprocessor(1024, []float32{0.5, 0.5, 0.5}, []float32{0.5, 0.5, 0.5}),
 		postprocessor: inference.NewPostprocessor(),
-		modelPath:     modelPath,
+		modelDir:      modelDir,
 	}
 }
 
-// startup is called when the app starts. The context is saved
-// so we can call the runtime methods
-func (a *App) startup(ctx context.Context) {
-	a.ctx = ctx
-	runtime.EventsEmit(ctx, "status", "initializing")
+// GetModels returns the available models configuration
+func (a *App) GetModels() []ModelConfig {
+	return AvailableModels
+}
+
+// IsModelDownloaded checks if a specific model exists in local disk
+func (a *App) IsModelDownloaded(modelID string) bool {
+	modelPath := filepath.Join(a.modelDir, modelID)
+	_, err := os.Stat(modelPath)
+	return err == nil
 }
 
 // RemoveBackground removes the background from a base64 encoded image
-func (a *App) RemoveBackground(imageBase64 string) (string, error) {
-	// Emit loading status
-	runtime.EventsEmit(a.ctx, "status", "loading_model")
+func (a *App) RemoveBackground(imageBase64 string, modelID string) (string, error) {
+	// Validate modelID
+	valid := false
+	for _, m := range AvailableModels {
+		if m.ID == modelID {
+			valid = true
+			break
+		}
+	}
+	if !valid {
+		return "", fmt.Errorf("invalid model selected: %s", modelID)
+	}
 
-	// Initialize session if not already done
+	modelPath := filepath.Join(a.modelDir, modelID)
+
+	// Check if model exists, download if it doesn't
+	if !a.IsModelDownloaded(modelID) {
+		runtime.EventsEmit(a.ctx, "status", "downloading_model")
+		if err := inference.DownloadModel(a.ctx, modelID, modelPath); err != nil {
+			runtime.EventsEmit(a.ctx, "status", "error")
+			return "", fmt.Errorf("failed to download requested model: %w", err)
+		}
+	}
+	// Initialize session
+	// If the user requested a different model than what is loaded, we must reload
+	if a.session != nil && a.session.GetModelPath() != modelPath {
+		a.session.Destroy()
+		a.session = nil
+	}
+
 	if a.session == nil {
-		session, err := inference.NewSession(a.modelPath)
+		runtime.EventsEmit(a.ctx, "status", "loading_model")
+		session, err := inference.NewSession(modelPath)
 		if err != nil {
 			runtime.EventsEmit(a.ctx, "status", "error")
 			return "", fmt.Errorf("failed to initialize ONNX session: %w", err)
@@ -134,4 +180,11 @@ func (a *App) RemoveBackground(imageBase64 string) (string, error) {
 // GetVersion returns the app version
 func (a *App) GetVersion() string {
 	return "1.0.0"
+}
+
+// startup is called when the app starts. The context is saved
+// so we can call the runtime methods
+func (a *App) startup(ctx context.Context) {
+	a.ctx = ctx
+	runtime.EventsEmit(ctx, "status", "initializing")
 }

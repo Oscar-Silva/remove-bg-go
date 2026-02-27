@@ -10,9 +10,16 @@ const store = useAppStore()
 </script>
 
 <template>
-  <div class="h-full flex flex-col bg-background">
+  <div class="h-full flex flex-col bg-background relative selection:bg-accent selection:text-white">
+    <!-- Static background layers for performance (60 FPS) -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-accent/10 blur-[120px]" />
+      <div class="absolute top-[30%] -right-[15%] w-[60%] h-[60%] rounded-full bg-purple-600/10 blur-[120px]" />
+      <div class="absolute -bottom-[20%] left-[20%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]" />
+    </div>
+
     <!-- Title Bar -->
-    <TitleBar />
+    <TitleBar class="z-10 relative" />
 
     <!-- Main Content -->
     <main class="flex-1 flex items-center justify-center p-8 overflow-auto">
