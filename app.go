@@ -36,10 +36,10 @@ type ModelConfig struct {
 }
 
 var AvailableModels = []ModelConfig{
-	{ID: "model.onnx", Name: "Alta Precisão (FP32)", SizeMB: 1024, RAM: "~2.0 GB", Speed: "Lenta", Quality: "Excelente", IsDefault: false},
-	{ID: "model_fp16.onnx", Name: "Equilibrado (FP16)", SizeMB: 513, RAM: "~1.0 GB", Speed: "Rápida", Quality: "Ótima", IsDefault: true},
-	{ID: "model_quantized.onnx", Name: "Rápido (INT8)", SizeMB: 366, RAM: "~700 MB", Speed: "Muito Rápida", Quality: "Boa", IsDefault: false},
-	{ID: "model_bnb4.onnx", Name: "Ultra Rápido (Q4)", SizeMB: 233, RAM: "~500 MB", Speed: "Mais Rápida", Quality: "Aceitável", IsDefault: false},
+	{ID: "model.onnx", Name: "High Precision (FP32)", SizeMB: 1024, RAM: "~2.0 GB", Speed: "Slow", Quality: "Excellent", IsDefault: false},
+	{ID: "model_fp16.onnx", Name: "Balanced (FP16)", SizeMB: 513, RAM: "~1.0 GB", Speed: "Fast", Quality: "Great", IsDefault: true},
+	{ID: "model_quantized.onnx", Name: "Fast (INT8)", SizeMB: 366, RAM: "~700 MB", Speed: "Very Fast", Quality: "Good", IsDefault: false},
+	{ID: "model_bnb4.onnx", Name: "Ultra Fast (Q4)", SizeMB: 233, RAM: "~500 MB", Speed: "Fastest", Quality: "Acceptable", IsDefault: false},
 }
 
 // NewApp creates a new App application struct
